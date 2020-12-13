@@ -1,0 +1,5 @@
+docker-compose up -d reverse-proxy
+
+docker-compose up -d whoami
+
+docker-compose down
