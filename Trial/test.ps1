@@ -57,3 +57,6 @@ function Test-Port {
 
 
 Test-Port mcvp-vm 4123
+
+
+Test-Port mcvp-vm 4124

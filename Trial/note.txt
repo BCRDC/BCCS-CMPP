@@ -4,4 +4,6 @@ docker-compose up -d whoami
 
 docker-compose up -d --build  whoami-no-tls
 
+docker-compose up -d --build  whoami-tls
+
 docker-compose down
