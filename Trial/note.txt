@@ -3,7 +3,13 @@ docker-compose up -d --build reverse-proxy
 docker-compose up -d whoami
 
 docker-compose up -d --build  whoami-no-tls
+# run with outputs
+docker-compose up --remove-orphans --force-recreate --no-deps --build  whoami-no-tls
 
-docker-compose up -d --build  whoami-tls
+# run backgroud with -d
+docker-compose up -d  --build  whoami-tls
+
+# run  
+docker-compose up --remove-orphans --force-recreate --no-deps --build  whoami-tls
 
 docker-compose down
