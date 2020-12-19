@@ -2,16 +2,32 @@ version: '3'
 
 services:
   reverse-proxy:
-    image: traefik:v1.7 # The official Traefik docker image
-    command: --api --docker # Enables the web UI and tells Traefik to listen to docker
+    # The official v2 Traefik docker image
+    image: traefik:v2.3
+    # Enables the web UI and tells Traefik to listen to docker
+    command: --api.insecure=true --providers.docker --entryPoints.whoami-no-tls.address=:4123
     ports:
-      - "80:80"     # The HTTP port
-      - "8080:8080" # The Web UI (enabled by --api)
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
+      # The HTTP port
+      - "80:80"
+      # The Web UI (enabled by --api.insecure=true)
+      - "8080:8080"
 
-      # ...
+      - "4123:4123"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+  # ...
   whoami:
-    image: traefik/whoami # A container that exposes an API to show its IP address
+    # A container that exposes an API to show its IP address
+    image: traefik/whoami
     labels:
-      - "traefik.frontend.rule=Host:whoami.docker.localhost"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.docker.localhost`)"
+  whoami-no-tls:
+    image: traefik/whoamitcp
+    command: -name whoami-no-tls
+    # ports:
+    #   - "8084:8080"
+    labels:
+      - "traefik.tcp.routers.whoami-no-tls.rule=HostSNI(`whoami-no-tls.docker.localhost`)"
+      - "traefik.tcp.services.whoami-no-tls.loadbalancer.server.port=4123"
+      - "traefik.tcp.routers.whoami-no-tls.entrypoints=whoami-no-tls"
