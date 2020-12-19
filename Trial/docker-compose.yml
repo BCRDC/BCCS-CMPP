@@ -25,9 +25,7 @@ services:
   whoami-no-tls:
     image: traefik/whoamitcp
     command: -name whoami-no-tls
-    # ports:
-    #   - "8084:8080"
     labels:
-      - "traefik.tcp.routers.whoami-no-tls.rule=HostSNI(`whoami-no-tls.docker.localhost`)"
+      - "traefik.tcp.routers.whoami-no-tls.rule=HostSNI(`*`)"
       - "traefik.tcp.services.whoami-no-tls.loadbalancer.server.port=4123"
       - "traefik.tcp.routers.whoami-no-tls.entrypoints=whoami-no-tls"
