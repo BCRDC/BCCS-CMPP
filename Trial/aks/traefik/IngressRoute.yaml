@@ -9,7 +9,7 @@ spec:
     - web
 
   routes:
-  - match: Host(`foo`) && PathPrefix(`/bar`)
+  - match: Host(`foo.chinaeast2.cloudapp.chinacloudapi.cn`) && PathPrefix(`/bar`)
     kind: Rule
     services:
     - name: whoami
