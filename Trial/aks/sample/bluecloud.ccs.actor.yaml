@@ -1,0 +1,57 @@
+  #  message-0.dispatcher.bccs.svc.cluster.local
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: message
+  namespace: bccs
+  # labels:
+  #   app: bluelcoud.ccs.dispatcher
+spec:
+  serviceName: message
+  replicas: 3
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: OrderedReady
+  selector:
+    matchLabels:
+      app: bluelcoud.ccs.dispatcher
+  template:
+    metadata:
+      labels:
+        app: bluelcoud.ccs.dispatcher
+    spec:
+      containers:
+      - name: bccsdispatcher
+        image: ccsacr.azurecr.cn/bluecloud.ccs.actor:v0219
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8082
+          protocol: TCP
+        volumeMounts:
+        - name: bccs-cluster
+          mountPath: /app/ccs.actor.hocon
+          subPath: ccs.actor.hocon
+      volumes:
+      - name: bccs-cluster
+        configMap:
+          # Provide the name of the ConfigMap containing the files you want
+          # to add to the container
+          name: bccs-cluster
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dispatcher
+  namespace: bccs
+  # labels:
+  #   app: bluelcoud.ccs.dispatcher
+spec:
+  ports:
+  - port: 8082
+    name: server
+  - port: 8081
+    name: leader-election
+  type: ClusterIP
+  selector:
+    app: bluelcoud.ccs.dispatcher

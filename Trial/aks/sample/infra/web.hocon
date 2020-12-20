@@ -1,0 +1,37 @@
+bluecloud.ccs.actor {
+  actorsystem: "bccs" #POPULATE NAME OF YOUR ACTOR SYSTEM HERE
+  port: "4053" 
+  remotehost: "lighthouse" 
+}
+
+
+akka {  
+    actor {
+        provider = cluster
+		deployment {
+			/tasker {
+				router = consistent-hashing-group
+				routees.paths = ["/user/dispatcher"]
+				virtual-nodes-factor = 8
+				cluster {
+						enabled = on
+						max-nr-of-instances-per-node = 2
+						allow-local-routees = off
+						use-role = worker
+				}
+			}                
+		}
+    }
+
+    remote {
+        dot-netty.tcp {
+		    port = 7777
+		    hostname = 0.0.0.0
+        }
+    }
+    cluster {
+		#will inject this node as a self-seed node at run-time
+		seed-nodes = ["akka.tcp://bccs@lighthouse.akkadomain.bccs.svc.cluster.local:4053"] #manually populate other seed nodes here, i.e. "akka.tcp://lighthouse@127.0.0.1:4053", "akka.tcp://lighthouse@127.0.0.1:4044"
+		roles = [web]
+	}
+}

@@ -1,0 +1,111 @@
+# apiVersion: apps/v1beta2
+# kind: Deployment
+# metadata:
+#   name: bluelcoud.ccs.web
+#   namespace: bccs
+#   labels:
+#     app: bluelcoud.ccs.web
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: bluelcoud.ccs.web
+#   template:
+#     metadata:
+#       labels:
+#         app: bluelcoud.ccs.web
+#     spec:
+#       hostname: bccsweb
+#       subdomain: bccs-app
+#       containers:
+#       - name: bccsweb
+#         image: ccsacr.azurecr.cn/bluecloud.ccs.web:v0219
+#         args: ["--urls=http://*:8002"]
+#         ports:
+#         - containerPort: 8002
+#           protocol: TCP
+#         - containerPort: 7777
+#           protocol: TCP
+#         env:
+#         - name: ACTORSYSTEM
+#           value: "bccs"
+#         - name: CLUSTER_PORT
+#           value: "7777"
+#         - name: CLUSTER_IP
+#           value: "bccsweb.bccs-app.bccs.svc.cluster.local"
+#         - name: CLUSTER_SEEDS
+#           value: "akka.tcp://bccs@lighthouse.akkadomain.bccs.svc.cluster.local:4053"
+#         volumeMounts:
+#         - name: bccs-cluster
+#           mountPath: /app/web.hocon
+#           subPath: web.hocon
+#       volumes:
+#       - name: bccs-cluster
+#         configMap:
+#           # Provide the name of the ConfigMap containing the files you want
+#           # to add to the container
+#           name: bccs-cluster
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bluelcoud.ccs.web
+  namespace: bccs
+  labels:
+    app: bluelcoud.ccs.web
+spec:
+  hostname: bccsweb
+  subdomain: bccs-app
+  containers:
+  - name: bccsweb
+    image: ccsacr.azurecr.cn/bluecloud.ccs.web:v0219
+    args: ["--urls=http://*:8002"]
+    ports:
+    - containerPort: 8002
+      protocol: TCP
+    - containerPort: 7777
+      protocol: TCP
+    env:
+    - name: ACTORSYSTEM
+      value: "bccs"
+    - name: CLUSTER_PORT
+      value: "7777"
+    - name: CLUSTER_IP
+      value: "bccsweb.bccs-app.bccs.svc.cluster.local"
+    - name: CLUSTER_SEEDS
+      value: "akka.tcp://bccs@lighthouse.akkadomain.bccs.svc.cluster.local:4053"
+    volumeMounts:
+    - name: bccs-cluster
+      mountPath: /app/web.hocon
+      subPath: web.hocon
+  volumes:
+  - name: bccs-cluster
+    configMap:
+      # Provide the name of the ConfigMap containing the files you want
+      # to add to the container
+      name: bccs-cluster
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: bccs-app
+  namespace: bccs
+spec:
+  selector:
+    app: bluelcoud.ccs.web
+  # clusterIP: None
+  type: ClusterIP
+  ports:
+  - name: app01
+    port: 8080
+    targetPort: 8002
+  - name: app02
+    port: 7777
+    targetPort: 7777
+
+
+    # http://40.73.124.114/weatherforecast

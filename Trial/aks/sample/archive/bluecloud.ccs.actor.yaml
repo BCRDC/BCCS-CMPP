@@ -1,0 +1,86 @@
+# apiVersion: apps/v1beta2
+# kind: Deployment
+# metadata:
+#   name: bluelcoud.ccs.actor
+#   namespace: bccs
+#   labels:
+#     app: bluelcoud.ccs.actor
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: bluelcoud.ccs.actor
+#   template:
+#     metadata:
+#       labels:
+#         app: bluelcoud.ccs.actor
+#     spec:
+#       hostname: bccsactor
+#       subdomain: bccs-actor
+#       containers:
+#       - name: bccsactor
+#         image: ccsacr.azurecr.cn/bluecloud.ccs.actor:v0219
+#         imagePullPolicy: Always
+#         ports:
+#         - containerPort: 8082
+#           protocol: TCP
+#         env:
+#         - name: ACTORSYSTEM
+#           value: "bccs"
+#         - name: CLUSTER_PORT
+#           value: "8082"
+#         - name: CLUSTER_IP
+#           value: "bccsactor.bccs-actor.bccs.svc.cluster.local"
+#         - name: CLUSTER_SEEDS
+#           value: "akka.tcp://bccs@lighthouse.akkadomain.bccs.svc.cluster.local:4053"
+
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bluelcoud.ccs.actor
+  namespace: bccs
+  labels:
+    app: bluelcoud.ccs.actor
+spec:
+  hostname: bccsactor
+  subdomain: bccs-actor
+  containers:
+  - name: bccsactor
+    image: ccsacr.azurecr.cn/bluecloud.ccs.actor:v0219
+    imagePullPolicy: Always
+    ports:
+    - containerPort: 8082
+      protocol: TCP
+    env:
+    - name: ACTORSYSTEM
+      value: "bccs"
+    - name: CLUSTER_PORT
+      value: "8082"
+    - name: CLUSTER_IP
+      value: "bccsactor.bccs-actor.bccs.svc.cluster.local"
+    - name: CLUSTER_SEEDS
+      value: "akka.tcp://bccs@lighthouse.akkadomain.bccs.svc.cluster.local:4053"
+
+---
+
+
+          
+apiVersion: v1
+kind: Service
+metadata:
+  name: bccs-actor
+  namespace: bccs
+spec:
+  selector:
+    app: bluelcoud.ccs.actor
+  # clusterIP: None
+  type: ClusterIP
+  ports:
+  - name: app03
+    port: 8081
+    targetPort: 8081
+  - name: app04
+    port: 8082
+    targetPort: 8082

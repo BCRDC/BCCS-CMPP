@@ -1,0 +1,65 @@
+#    lighthouse.bccs.svc.cluster.local
+apiVersion: v1
+kind: Pod
+metadata:
+  name: akka.lighthouse
+  namespace: bccs
+  labels:
+    app: akka.lighthouse
+spec:
+  hostname: lighthouse
+  subdomain: akkadomain
+  containers:
+  - name: akkalighthouse
+    image: ccsacr.azurecr.cn/lighthouse:v1
+    ports:
+    - containerPort: 9110
+      protocol: TCP
+    - containerPort: 4053
+      protocol: TCP
+    # - port: 9110
+    #   protocol: TCP
+    #   targetPort: 9110
+    # - port: 4053
+    #   protocol: TCP
+    #   targetPort: 4053
+    imagePullPolicy: Always
+    env:
+    - name: ACTORSYSTEM
+      value: "bccs"
+    - name: CLUSTER_PORT
+      value: "4053"
+    - name: CLUSTER_IP
+      value: "lighthouse.akkadomain.bccs.svc.cluster.local"
+    - name: CLUSTER_SEEDS
+      value: "akka.tcp://bccs@lighthouse.akkadomain.bccs.svc.cluster.local:4053"
+    volumeMounts:
+    - name: bccs-cluster
+      mountPath: /app/akka.hocon
+      subPath: akka.hocon
+  volumes:
+  - name: bccs-cluster
+    configMap:
+      # Provide the name of the ConfigMap containing the files you want
+      # to add to the container
+      name: bccs-cluster
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: akkadomain
+  namespace: bccs
+spec:
+  selector:
+    app: akka.lighthouse
+  # clusterIP: None
+  type: ClusterIP
+  ports:
+  - name: lighthouse01forpod1
+    port: 4053
+    targetPort: 4053
+  - name: lighthouse02forpod1
+    port: 9110
+    targetPort: 9110

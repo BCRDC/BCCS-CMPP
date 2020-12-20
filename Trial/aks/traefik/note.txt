@@ -1,0 +1,7 @@
+kubectl apply -f rbac.yaml
+
+kubectl apply -f traefik.yaml
+
+kubectl apply -f images.yaml
+
+kubectl apply -f IngressRoute.yaml

@@ -1,0 +1,5 @@
+kubectl delete IngressRoute myingressroute
+
+kubectl delete IngressRouteTCP ingressroute.tcp
+
+kubectl delete IngressRouteUDP ingressroute.udp
