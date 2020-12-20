@@ -26,7 +26,7 @@ spec:
   entryPoints:
     - tcpep
   routes:
-  - match: HostSNI(`bar`)
+  - match: HostSNI(`*`)
     kind: Rule
     services:
       - name: whoamitcp
@@ -41,7 +41,7 @@ metadata:
 
 spec:
   entryPoints:
-    - fooudp
+    - udpep
   routes:
   - kind: Rule
     services:

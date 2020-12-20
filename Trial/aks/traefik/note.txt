@@ -5,3 +5,6 @@ kubectl apply -f traefik.yaml
 kubectl apply -f images.yaml
 
 kubectl apply -f IngressRoute.yaml
+
+
+# use `kubectl delete -f` if you want to delete resource
