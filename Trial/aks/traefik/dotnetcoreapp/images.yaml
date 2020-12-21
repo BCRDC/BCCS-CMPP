@@ -1,0 +1,60 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: dotnetcoretcpserver
+  namespace: cmpp
+  labels:
+    app: traefiklabs
+    name: dotnetcoretcp
+
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: traefiklabs
+      task: dotnetcoretcp
+  template:
+    metadata:
+      labels:
+        app: traefiklabs
+        task: dotnetcoretcp
+    spec:
+      containers:
+        - name: tcpserver
+          image: ccsacr.azurecr.cn/tcpserver:v122106
+          ports:
+            - containerPort: 8001
+          env:
+            - name: CLUSTER_PORT
+              value: "8001"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: CLUSTER_IP
+              value: "$(POD_NAME)"
+          readinessProbe:
+            tcpSocket:
+              port: 8001
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8001
+            initialDelaySeconds: 15
+            periodSeconds: 10
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dotnetcoretcpserver
+  namespace: cmpp
+
+spec:
+  ports:
+    - protocol: TCP
+      port: 8001
+  selector:
+    app: traefiklabs
+    task: dotnetcoretcp
