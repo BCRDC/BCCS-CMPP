@@ -1,4 +1,9 @@
 
+param(
+    [Parameter(Mandatory = $true)]
+    [String]$Content
+
+)
 
 $Account = "jiwagTest"
 $Sig = "jiwagsig"
@@ -10,7 +15,7 @@ $Header = @{
 
 $MessageBody = @{
     CandidateSig = $Sig
-    Text = "hello test"
+    Text = $Content
 }
 
 $Body = @{
